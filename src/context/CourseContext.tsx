@@ -116,9 +116,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({children }) => {
     }
       const courseData = courseDoc.data() as Course;
       return {...courseData, id: courseDoc.id } as Course;
-  } catch (error: any) {
+  } catch (error: unknown) {
       console.error(`Failed to fetch course ${courseId}:`, error);
-      const errorMessage = error.message || 'Failed to fetch course';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch course';
       if (!internalCall) setError(errorMessage);
       throw new Error(errorMessage);
   } finally {
@@ -156,16 +156,16 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({children }) => {
       const querySnapshot = await getDocs(finalQuery);
       const fetchedCoursesData: Course[] = [];
       querySnapshot.forEach((docSnap) => {
-        const data = docSnap.data();
+        const data = docSnap.data() as Course;
         fetchedCoursesData.push({id: docSnap.id, ...data } as Course);
     });
       if (!options?.featured) {
         setCourses(fetchedCoursesData);
     }
       return fetchedCoursesData;
-  } catch (error: any) {
+  } catch (error: unknown) {
       console.error('Failed to fetch courses:', error);
-      const errorMessage = error.message || 'Failed to fetch courses';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch courses';
       if (!internalCall) setError(errorMessage);
       throw new Error(errorMessage);
   } finally {
@@ -193,9 +193,10 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({children }) => {
       });
     }
       return progress;
-  } catch (error) {
-      console.error(`Error fetching course progress for ${courseId}:`, error);
-      return null;
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error(`Error fetching course progress for ${courseId}:`, error);
+    return null;
   }
 }, [user, getFirestoreUserId]);
 
@@ -260,9 +261,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({children }) => {
       setCompletedCourses(completed);
       setCourseProgress(prevGlobalProgress => ({...prevGlobalProgress, ...tempProgressMap }));
       return finalEnrolledCourses;
-  } catch (error: any) {
+  } catch (error: unknown) {
       console.error('Error fetching enrolled courses:', error);
-      const errorMessage = error.message || 'Failed to fetch enrolled courses';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch enrolled courses';
       if(!internalCall) setError(errorMessage);
       throw new Error(errorMessage);
   } finally {
@@ -298,9 +299,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({children }) => {
       const completedCoursesData = (await Promise.all(completedCoursesPromises)).filter((c): c is Course & {progress: number } => c !== undefined);
       setCompletedCourses(completedCoursesData);
       return completedCoursesData;
-  } catch (error: any) {
+  } catch (error: unknown) {
       console.error('Error fetching completed courses:', error);
-      const errorMessage = error.message || 'Failed to fetch completed courses';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to fetch completed courses';
       if(!internalCall) setError(errorMessage);
       throw new Error(errorMessage);
   } finally {
@@ -357,9 +358,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({children }) => {
       }
     }
       await fetchEnrolledCourses(true);
-  } catch (error: any) {
+  } catch (error: unknown) {
       console.error(`Failed to enroll in course ${courseId}:`, error);
-      const errorMessage = error.message || 'Failed to enroll in course';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to enroll in course';
       if(!internalCall) setError(errorMessage);
       throw new Error(errorMessage);
   } finally {
@@ -387,9 +388,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({children }) => {
       const enrollmentDocRef = enrollmentSnapshot.docs[0].ref;
       await updateDoc(enrollmentDocRef, {status: 'inactive', updatedAt: new Date().toISOString() });
       await fetchEnrolledCourses(true);
-  } catch (error: any) {
+  } catch (error: unknown) {
       console.error(`Failed to unenroll from course ${courseId}:`, error);
-      const errorMessage = error.message || 'Failed to unenroll from course';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to unenroll from course';
       if(!internalCall) setError(errorMessage);
       throw new Error(errorMessage);
   } finally {
@@ -434,9 +435,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({children }) => {
         console.warn(`updateLessonProgress service did not return updated progress for ${courseId}.`);
     }
       await fetchEnrolledCourses(true);
-  } catch (error: any) {
+  } catch (error: unknown) {
       console.error(`Failed to update progress for lesson ${lessonId} in course ${courseId}:`, error);
-      const errorMessage = error.message || 'Failed to update course progress';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to update course progress';
       if(!internalCall) setError(errorMessage);
       throw new Error(errorMessage);
   } finally {
@@ -462,9 +463,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({children }) => {
         console.warn(`markModuleComplete service did not return updated progress for ${courseId}.`);
     }
       await fetchEnrolledCourses(true);
-  } catch (error: any) {
+  } catch (error: unknown) {
       console.error(`Failed to mark module ${moduleId} complete in course ${courseId}:`, error);
-      const errorMessage = error.message || 'Failed to mark module as complete';
+      const errorMessage = error instanceof Error ? error.message : 'Failed to mark module complete';
       if(!internalCall) setError(errorMessage);
       throw new Error(errorMessage);
   } finally {
@@ -511,9 +512,9 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({children }) => {
     });
       await fetchEnrolledCourses(true);
       return certificateDocId;
-  } catch (error: any) {
-      console.error(`Failed to mark course ${courseId} as complete:`, error);
-      const errorMessage = error.message || 'Failed to mark course as complete';
+  } catch (error: unknown) {
+      console.error(`Failed to mark course ${courseId} complete:`, error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to mark course complete';
       if(!internalCall) setError(errorMessage);
       throw new Error(errorMessage);
   } finally {
@@ -582,10 +583,10 @@ export const CourseProvider: React.FC<CourseProviderProps> = ({children }) => {
       }
     }
       return filteredResults;
-  } catch (error: any) {
+  } catch (error: unknown) {
       console.error('Failed to search courses:', error);
-      const errorMessage = error.message || 'Failed to search courses';
-      if(!internalCall) setError(errorMessage);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to search courses';
+      if (!internalCall) setError(errorMessage);
       throw new Error(errorMessage);
   } finally {
       if (!internalCall) setLoading(false);

@@ -34,7 +34,7 @@ export function useCourse(courseId: string | undefined) {
         }
 
         console.log(`Course data fetched successfully for ${courseId}`);
-        const courseDocData = courseSnapshot.data();
+        const courseDocData = courseSnapshot.data() as Course;
 
         // Fetch modules
         const modulesPath = `courses/${courseId}/modules`;
@@ -53,8 +53,8 @@ export function useCourse(courseId: string | undefined) {
         }
 
         // Process modules and fetch lesson stubs for each module
-        const moduleChunks: Array<Array<any>> = [];
-        const chunkSize = 3; 
+        const moduleChunks: Array<Array<QueryDocumentSnapshot<Module>>> = []; // Refined type based on Firestore SDK return type
+        const chunkSize = 3;
 
         for (let i = 0; i < modulesSnapshot.docs.length; i += chunkSize) {
           moduleChunks.push(modulesSnapshot.docs.slice(i, i + chunkSize));
@@ -66,8 +66,8 @@ export function useCourse(courseId: string | undefined) {
         for (const moduleChunk of moduleChunks) {
           console.log(`Processing chunk with ${moduleChunk.length} modules`);
 
-          const modulePromises = moduleChunk.map(async (moduleDoc: any) => {
-            const moduleData = moduleDoc.data();
+          const modulePromises = moduleChunk.map(async (moduleDoc: QueryDocumentSnapshot<Module>) => {
+            const moduleData = moduleDoc.data() as Module;
             const moduleId = moduleDoc.id;
             console.log(`Processing module ${moduleId}`);
             console.log(`Module data for ${moduleId}:`, moduleData);
@@ -87,16 +87,16 @@ export function useCourse(courseId: string | undefined) {
               });
 
               if (lessonsSnapshot.docs.length > 0) {
-                lessonStubs = lessonsSnapshot.docs.map((lessonDoc: any) => {
-                  const lessonData = lessonDoc.data();
-                  return {
+                lessonStubs = lessonsSnapshot.docs.map((lessonDoc: QueryDocumentSnapshot<Lesson>) => {
+                  const lessonData = lessonDoc.data() as Lesson;
+                  return { // Explicitly map fields to Lesson interface
                     id: lessonDoc.id,
                     title: lessonData.title || 'Untitled Lesson',
                     description: lessonData.description,
                     type: lessonData.type || 'text',
                     content: lessonData.content,
                     videoId: lessonData.videoId,
-                    duration: lessonData.duration ?? 0, // Default duration to 0 if not specified
+                    duration: lessonData.duration ?? 0,
                     order: lessonData.order ?? 0,
                     status: lessonData.status || 'draft',
                     quizQuestions: lessonData.quizQuestions || lessonData.questions,
@@ -109,11 +109,11 @@ export function useCourse(courseId: string | undefined) {
                     instructorTitle: lessonData.instructorTitle,
                     instructorBio: lessonData.instructorBio,
                     instructorAvatar: lessonData.instructorAvatar,
-                  } as Lesson;
+                  } as Lesson; // Cast to Lesson
                 });
               }
 
-              return {
+              return { // Explicitly map fields to Module interface
                 id: moduleId,
                 title: moduleData.title || 'Untitled Module',
                 description: moduleData.description,
@@ -128,15 +128,15 @@ export function useCourse(courseId: string | undefined) {
                 sectionId: moduleData.sectionId,
                 createdAt: moduleData.createdAt,
                 updatedAt: moduleData.updatedAt,
-                lessonCount: lessonStubs.length, // Calculated lesson count
+                lessonCount: lessonStubs.length,
                 instructor: moduleData.instructor,
                 instructorTitle: moduleData.instructorTitle,
                 instructorBio: moduleData.instructorBio,
                 instructorAvatar: moduleData.instructorAvatar,
-              } as Module;
+              } as Module; // Cast to Module
             } catch (error) {
               console.error(`Error fetching lessons for module ${moduleId}:`, error);
-              return {
+              return { // Explicitly map fields to Module interface on error
                 id: moduleId,
                 title: moduleData.title || 'Untitled Module',
                 description: moduleData.description,
@@ -144,7 +144,6 @@ export function useCourse(courseId: string | undefined) {
                 status: moduleData.status || 'draft',
                 lessons: [],
                 lessonCount: 0,
-                // Optional fields can be omitted or set to defaults
                 isRequired: moduleData.isRequired,
                 availableFrom: moduleData.availableFrom,
                 availableTo: moduleData.availableTo,
@@ -157,7 +156,7 @@ export function useCourse(courseId: string | undefined) {
                 instructorTitle: moduleData.instructorTitle,
                 instructorBio: moduleData.instructorBio,
                 instructorAvatar: moduleData.instructorAvatar,
-              } as Module;
+              } as Module; // Cast to Module
             }
           });
 
@@ -167,7 +166,7 @@ export function useCourse(courseId: string | undefined) {
 
         const totalLessonsCount = allModules.reduce((acc, module) => acc + (module.lessons?.length || 0), 0);
 
-        const finalCourseData: Course = {
+        const finalCourseData: Course = { // Explicitly map fields to Course interface
           id: courseSnapshot.id,
           title: courseDocData.title || 'Untitled Course',
           description: courseDocData.description || '',
@@ -175,7 +174,7 @@ export function useCourse(courseId: string | undefined) {
           thumbnail: courseDocData.thumbnail || '',
           duration: courseDocData.duration || 'N/A',
           durationDetails: courseDocData.durationDetails,
-          lessons: courseDocData.lessons ?? totalLessonsCount, // Use fetched/calculated if not present
+          lessons: courseDocData.lessons ?? totalLessonsCount,
           level: courseDocData.level || 'Beginner',
           instructor: courseDocData.instructor || 'N/A',
           instructorTitle: courseDocData.instructorTitle,
@@ -202,7 +201,7 @@ export function useCourse(courseId: string | undefined) {
           categoryIds: courseDocData.categoryIds,
         };
 
-        return {
+        return { // Cast the final result
           ...finalCourseData,
           modules: allModules,
         } as Course & { modules: Module[] };
@@ -221,18 +220,18 @@ export function useCourse(courseId: string | undefined) {
 // Hook to fetch user enrollments
 export function useEnrollments(userId: string | undefined) {
   const queryClient = useQueryClient();
-  
+
   const result = useQuery({
     queryKey: ['enrollments', userId],
     queryFn: async () => {
       if (!userId) return [];
-      
+
       try {
         const enrollmentsRef = collection(firestore, `users/${userId}/enrollments`);
         const snapshot = await getDocs(enrollmentsRef);
-        return snapshot.docs.map(doc => {
-          const data = doc.data();
-          return {
+        return snapshot.docs.map((doc: QueryDocumentSnapshot<CourseEnrollment>) => {
+          const data = doc.data() as CourseEnrollment;
+          return { // Explicitly map fields to CourseEnrollment interface
             id: doc.id,
             courseId: data.courseId || doc.id, // Fallback if courseId doesn't exist
             courseName: data.courseName || 'Unknown Course Name',
@@ -245,7 +244,7 @@ export function useEnrollments(userId: string | undefined) {
             completedLessons: data.completedLessons ?? [], // Default to empty array if not present
             totalLessons: data.totalLessons ?? 0, // Default to 0 if not present
             lastAccessedAt: data.lastAccessedAt || new Date().toISOString(), // Default to now if not present
-          } as CourseEnrollment;
+          } as CourseEnrollment; // Cast to CourseEnrollment
         });
       } catch (error) {
         console.error(`Error fetching enrollments for user ${userId}:`, error);
@@ -257,35 +256,35 @@ export function useEnrollments(userId: string | undefined) {
     gcTime: 30 * 60 * 1000, // Keep in cache for 30 minutes even when inactive
     retry: 2,
   });
-  
+
   // Add a function to manually update the progress in the cache
   const updateProgressInCache = useCallback((
     courseId: string,
     completedLessonKey: string,
-    totalLessonsForCourse: number // Added parameter
+    totalLessonsForCourse: number
   ) => {
     if (!userId) return;
-    
+
     queryClient.setQueryData(['enrollments', userId], (oldData: CourseEnrollment[] | undefined) => {
       if (!oldData) return oldData;
-      
+
       return oldData.map((enrollment: CourseEnrollment) => {
         if (enrollment.courseId === courseId) {
           // Only add if not already in the array
           const completedLessons = enrollment.completedLessons || [];
           if (!completedLessons.includes(completedLessonKey)) {
             const newCompletedLessons = [...completedLessons, completedLessonKey];
-            
+
             // Use the passed totalLessonsForCourse for accurate optimistic update
             // Ensure totalLessonsForCourse is at least 1 to prevent division by zero
             const safeTotalLessons = Math.max(1, totalLessonsForCourse);
             const { overallProgress } = calculateCourseProgress(newCompletedLessons, safeTotalLessons);
-            
+
             return {
               ...enrollment,
               completedLessons: newCompletedLessons,
               progress: overallProgress,
-              totalLessons: safeTotalLessons // Optionally update totalLessons in cache too
+              totalLessons: safeTotalLessons
             };
           }
         }
@@ -293,7 +292,7 @@ export function useEnrollments(userId: string | undefined) {
       });
     });
   }, [userId, queryClient]);
-  
+
   return {
     ...result,
     updateProgressInCache
@@ -311,7 +310,7 @@ export function usePrefetchLesson(
     prefetchNextLesson: (nextLessonId: string) => {
       // Ensure all necessary IDs are present before attempting to prefetch
       if (courseId && moduleId && nextLessonId) {
-        queryClient.prefetchQuery({
+        void queryClient.prefetchQuery({
           queryKey: ['lesson', courseId, moduleId, nextLessonId],
           queryFn: async () => {
             try {
@@ -361,25 +360,26 @@ export function usePrefetchLesson(
 // Hook to fetch a single lesson with timestamp checking
 export function useLesson(courseId: string | undefined, moduleId: string | undefined, lessonId: string | undefined, forceRefresh?: number) {
   const queryClient = useQueryClient();
-  
+
   // Add a lastUpdatedCheck state to track when we last checked for updates
   const [lastUpdateCheck, setLastUpdateCheck] = useState<number>(Date.now());
-  
+
   // Create a lightweight query to just fetch the lesson's metadata (updatedAt timestamp)
   const metadataQuery = useQuery({
     queryKey: ['lesson-metadata', courseId, moduleId, lessonId, lastUpdateCheck],
     queryFn: async () => {
       if (!courseId || !moduleId || !lessonId) return null;
-      
+
       try {
         const lessonRef = doc(firestore, `courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`);
         const metaSnapshot = await getDoc(lessonRef);
-        
+
         if (!metaSnapshot.exists()) return null;
-        
+
         // Only return the updatedAt timestamp to minimize data transfer
-        return { 
-          updatedAt: metaSnapshot.data().updatedAt,
+        const metaData = metaSnapshot.data() as { updatedAt: Timestamp | string | undefined; id: string }; // Explicitly type metadata
+        return { // Explicitly map metadata fields
+          updatedAt: metaData.updatedAt,
           id: metaSnapshot.id
         };
       } catch (error) {
@@ -392,10 +392,10 @@ export function useLesson(courseId: string | undefined, moduleId: string | undef
     gcTime: 2 * 60 * 1000, // Keep metadata in cache for 2 minutes
     retry: 1
   });
-  
+
   // Main query to fetch the full lesson data
   const queryResult = useQuery({
-    queryKey: ['lesson', courseId, moduleId, lessonId, metadataQuery.data?.updatedAt],
+    queryKey: ['lesson', courseId, moduleId, lessonId], // Removed metadataQuery.data?.updatedAt
     queryFn: async () => {
       // Log when the query function is executed
       console.log('useLesson queryFn executing with:', { courseId, moduleId, lessonId });
@@ -439,7 +439,7 @@ export function useLesson(courseId: string | undefined, moduleId: string | undef
         }
 
         // Get the lesson data
-        const lessonData = lessonSnapshot.data();
+        const lessonData = lessonSnapshot.data() as Lesson;
         console.log(`Lesson data fetched successfully:`, {
           id: lessonSnapshot.id,
           title: lessonData.title,
@@ -448,8 +448,8 @@ export function useLesson(courseId: string | undefined, moduleId: string | undef
           hasQuizQuestions: !!lessonData.quizQuestions || !!lessonData.questions
         });
 
-        // Return the lesson data with its ID
-        return {
+        // Return the lesson data with its ID, explicitly mapping fields
+        return { // Explicitly map fields to Lesson interface
           id: lessonSnapshot.id,
           title: lessonData.title || 'Untitled Lesson',
           description: lessonData.description,
@@ -469,19 +469,30 @@ export function useLesson(courseId: string | undefined, moduleId: string | undef
           instructorTitle: lessonData.instructorTitle,
           instructorBio: lessonData.instructorBio,
           instructorAvatar: lessonData.instructorAvatar,
-        } as Lesson;
+        } as Lesson; // Cast to Lesson
       } catch (error) {
-        console.error(`Error fetching lesson ${lessonId}:`, error);
-        throw error;
+        console.error(`Error fetching lesson ${lessonId} for course ${courseId}, module ${moduleId}:`, error);
+        throw error; // Re-throw to be consistent with useQuery behavior
       }
     },
     enabled: !!courseId && !!moduleId && !!lessonId,
     staleTime: STALE_TIMES.SEMI_STATIC,
-    gcTime: 30 * 60 * 1000,
-    retry: 2
+    gcTime: 60 * 60 * 1000,
+    retry: 2,
   });
 
-  // Add error logging outside the query options
+  // Effect to trigger a metadata check periodically or on forceRefresh
+  useEffect(() => {
+    // Trigger a check if forceRefresh changes or periodically
+    const interval = setInterval(() => {
+      setLastUpdateCheck(Date.now());
+    }, 60 * 1000); // Check every minute
+
+    // Clear interval on component unmount or when dependencies change
+    return () => clearInterval(interval);
+  }, [forceRefresh]); // Depend on forceRefresh to allow manual refresh
+
+  // Add error logging inside the hook
   useEffect(() => {
     if (queryResult.error) {
       console.error('useLesson query error:', queryResult.error);

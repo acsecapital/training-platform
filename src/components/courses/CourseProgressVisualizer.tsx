@@ -1,6 +1,6 @@
 import React, {useState, useEffect } from 'react';
 import {Course, Module, Lesson, CourseProgress } from '@/types/course.types';
-import {collection, getDocs, query, orderBy, doc, getDoc, QueryDocumentSnapshot } from 'firebase/firestore';
+import {collection, getDocs, query, orderBy, doc, getDoc, QueryDocumentSnapshot, QuerySnapshot, FirestoreDataConverter } from 'firebase/firestore';
 import {firestore } from '@/services/firebase';
 import Button from '@/components/ui/Button';
 import Link from 'next/link';
@@ -10,6 +10,39 @@ interface CourseProgressVisualizerProps {
   courseId: string;
   progress?: CourseProgress;
 }
+
+const lessonConverter: FirestoreDataConverter<Lesson> = {
+  toFirestore: (lesson: Lesson) => {
+    // Convert Lesson object to Firestore data (omit id)
+    const { id, ...rest } = lesson;
+    return rest;
+  },
+  fromFirestore: (snapshot: QueryDocumentSnapshot) => {
+    // Convert Firestore data to Lesson object
+    const data = snapshot.data();
+    return {
+      id: snapshot.id,
+      title: data.title as string || '', // Explicitly cast and provide default
+      description: data.description as string || '', // Explicitly cast and provide default
+      type: data.type as string || 'text', // Explicitly cast and provide default
+      content: data.content as string || '', // Explicitly cast and provide default
+      videoId: data.videoId as string | undefined, // Explicitly cast
+      duration: data.duration as number | undefined, // Explicitly cast
+      order: data.order as number || 0, // Explicitly cast and provide default
+      status: data.status as 'draft' | 'published' | 'archived' || 'draft', // Explicitly cast and provide default
+      quizQuestions: (data.quizQuestions || data.questions) as AdminQuizQuestion[] | undefined, // Explicitly cast to AdminQuizQuestion[]
+      passingScore: data.passingScore as number | undefined, // Explicitly cast
+      resources: data.resources as string[] | undefined, // Explicitly cast
+      createdAt: data.createdAt as string | undefined, // Explicitly cast
+      updatedAt: data.updatedAt as string | undefined, // Explicitly cast
+      completed: data.completed as boolean | undefined, // Explicitly cast
+      instructor: data.instructor as string | undefined, // Explicitly cast
+      instructorTitle: data.instructorTitle as string | undefined, // Explicitly cast
+      instructorBio: data.instructorBio as string | undefined, // Explicitly cast
+      instructorAvatar: data.instructorAvatar as string | undefined, // Explicitly cast
+    };
+  },
+};
 
 const CourseProgressVisualizer: React.FC<CourseProgressVisualizerProps> = ({
   courseId,
@@ -26,7 +59,7 @@ const CourseProgressVisualizer: React.FC<CourseProgressVisualizerProps> = ({
   // Fetch course data
   useEffect(() => {
     const fetchCourseData = async () => {
-      if (!courseId) return;
+      if (!courseId || !user?.uid) return; // Add check for user existence
 
       try {
         setLoading(true);
@@ -54,7 +87,7 @@ const CourseProgressVisualizer: React.FC<CourseProgressVisualizerProps> = ({
         const modulesSnapshot = await getDocs(modulesQuery);
 
         const modulesData: Module[] = [];
-        const lessonPromises: Promise<any>[] = [];
+        const lessonPromises: Promise<QuerySnapshot<Lesson>>[] = [];
 
         // Process modules and collect lesson fetch promises
         for (const moduleDoc of modulesSnapshot.docs) {
@@ -87,7 +120,7 @@ const CourseProgressVisualizer: React.FC<CourseProgressVisualizerProps> = ({
         }
 
           // Prepare lesson fetch promises for this module
-          const lessonsRef = collection(firestore, `courses/${courseId}/modules/${moduleDoc.id}/lessons`);
+          const lessonsRef = collection(firestore, `courses/${courseId}/modules/${moduleDoc.id}/lessons`).withConverter(lessonConverter);
           const lessonsQuery = query(lessonsRef, orderBy('order', 'asc'));
           lessonPromises.push(getDocs(lessonsQuery));
 
@@ -109,10 +142,7 @@ const CourseProgressVisualizer: React.FC<CourseProgressVisualizerProps> = ({
               const lessonData = lessonDoc.data();
               return lessonData.status === 'published';
           })
-            .map((lessonDoc: QueryDocumentSnapshot<Lesson>) => ({
-              id: lessonDoc.id,
-              ...lessonDoc.data() as Omit<Lesson, 'id'>
-          }));
+            .map((lessonDoc: QueryDocumentSnapshot<Lesson>) => lessonDoc.data()); // Use data directly from converter
           module.lessons = lessonsData;
       });
 
@@ -131,16 +161,17 @@ const CourseProgressVisualizer: React.FC<CourseProgressVisualizerProps> = ({
       });
         setExpandedModules(initialExpandedState);
 
-    } catch (err: any) {
+    } catch (err: unknown) {
         console.error('Error fetching course structure:', err);
-        setError('Failed to load course structure. Please try again.');
+        const errorMessage = err instanceof Error ? err.message : 'Failed to load course structure. Please try again.';
+        setError(errorMessage);
     } finally {
         setLoading(false);
     }
   };
 
     fetchCourseData();
-}, [courseId, expandAll, progress]);
+}, [courseId, expandAll, progress, user?.uid]); // Add user?.uid to dependency array
 
   // Toggle module expansion
   const toggleModule = (moduleId: string) => {
@@ -269,6 +300,9 @@ const CourseProgressVisualizer: React.FC<CourseProgressVisualizerProps> = ({
 
   return (
     <div className="space-y-4">
+      {course && (
+        <h1 className="text-2xl font-bold text-neutral-900 mb-4">{course.title}</h1>
+      )}
       {/* Overall Progress */}
       <div className="bg-white shadow-sm rounded-lg overflow-hidden border border-neutral-200 p-4">
         <h2 className="text-lg font-medium text-neutral-900 mb-2">Course Progress</h2>

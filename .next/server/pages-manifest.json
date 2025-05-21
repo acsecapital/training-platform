@@ -3,7 +3,7 @@
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
   "/my-learning": "pages/my-learning.js",
-  "/courses": "pages/courses.js",
+  "/courses/[id]/learn": "pages/courses/[id]/learn.js",
   "/courses/[id]": "pages/courses/[id].js",
-  "/courses/[id]/learn": "pages/courses/[id]/learn.js"
+  "/courses": "pages/courses.js"
 }

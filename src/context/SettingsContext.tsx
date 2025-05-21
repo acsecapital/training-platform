@@ -91,7 +91,8 @@ export const SettingsProvider: React.FC<{children: React.ReactNode }> = ({childr
       }
 
         setLoading(false);
-    } catch (error: any) {
+    } catch (error: unknown) {
+        const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred';
         console.error('Error fetching settings:', error);
         setError(error.message);
         setLoading(false);
