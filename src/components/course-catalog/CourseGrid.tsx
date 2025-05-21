@@ -1,6 +1,4 @@
 import React from 'react';
-import { useAuth } from '@/context/AuthContext';
-import { useCourses } from '@/context/CourseContext';
 import CourseCard from './CourseCard';
 import { CourseWithProgress } from '@/types/course.types';
 
@@ -15,9 +13,6 @@ const CourseGrid: React.FC<CourseGridProps> = ({
   className = '',
   columns = 3,
 }) => {
-  const { user } = useAuth();
-  const { courseProgress, enrolledCourses } = useCourses();
-
   // Grid column classes based on the columns prop
   const gridColumnClasses = {
     1: 'grid-cols-1',
@@ -41,23 +36,6 @@ const CourseGrid: React.FC<CourseGridProps> = ({
       })}
     </div>
   );
-};
-
-// Simple placeholder function for formatting dates
-// In a real application, you might import a shared utility function
-const formatDate = (dateString?: string): string => {
-  if (!dateString) return 'N/A';
-  try {
-    const date = new Date(dateString);
-    // Check if the date is valid
-    if (isNaN(date.getTime())) {
-      return 'Invalid Date';
-    }
-    return date.toLocaleDateString();
-  } catch (error) {
-    console.error('Error formatting date:', error);
-    return 'Invalid Date';
-  }
 };
 
 

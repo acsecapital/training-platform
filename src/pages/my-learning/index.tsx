@@ -330,7 +330,7 @@ export default function MyLearningPage() {
       }
     };
 
-    fetchLessonStats();
+    void fetchLessonStats();
   }, [user, enrolledCourses, completedCourses]);
 
   const formatLearningTime = (seconds: number): string => {
@@ -396,177 +396,169 @@ export default function MyLearningPage() {
                 </div>
               )}
 
-              {/* Progress Summary */}
+              {/* Progress Summary - Split into two cards */}
+              {/* Your Learning Progress Section */}
               <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
                 <h2 className="text-lg font-medium text-gray-900 mb-6">Your Learning Progress</h2>
 
-                {/* Course Progress Section */}
-                <div className="mb-8">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="border border-gray-100 rounded p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-500">In Progress</p>
-                          <p className="text-xl font-medium text-gray-900 mt-1">{enrolledCourses.length} Courses</p>
-                        </div>
-                        <div className="p-2 bg-blue-50 rounded-full">
-                          <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                          </svg>
-                        </div>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="border border-gray-100 rounded p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">In Progress</p>
+                        <p className="text-xl font-medium text-gray-900 mt-1">{enrolledCourses.length} Courses</p>
                       </div>
-                      <div className="mt-4">
-                        <div className="w-full bg-gray-100 rounded-full h-1.5">
-                          <div
-                            className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
-                            style={{ width: `${progressPercentages.enrolled}%` }}
-                          ></div>
-                        </div>
+                      <div className="p-2 bg-blue-50 rounded-full">
+                        <svg className="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
                       </div>
                     </div>
-
-                    <div className="border border-gray-100 rounded p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-500">Completed</p>
-                          <p className="text-xl font-medium text-gray-900 mt-1">{completedCourses.length} Courses</p>
-                        </div>
-                        <div className="p-2 bg-green-50 rounded-full">
-                          <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="mt-4">
-                        <div className="w-full bg-gray-100 rounded-full h-1.5">
-                          <div
-                            className="bg-green-500 h-1.5 rounded-full transition-all duration-300"
-                            style={{ width: `${progressPercentages.completed}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="border border-gray-100 rounded p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-500">Learning Time</p>
-                          <p className="text-xl font-medium text-gray-900 mt-1">{totalLearningTimeHours} Hours</p>
-                        </div>
-                        <div className="p-2 bg-indigo-50 rounded-full">
-                          <svg className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
+                    <div className="mt-4">
+                      <div className="w-full bg-gray-100 rounded-full h-1.5">
+                        <div
+                          className="bg-blue-500 h-1.5 rounded-full transition-all duration-300"
+                          style={{ width: `${progressPercentages.enrolled}%` }}
+                        ></div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Lesson Progress Section */}
-                <div className="mt-8 pt-8 border-t border-gray-100">
-                  <h3 className="text-lg font-medium text-gray-900 mb-6">Lesson Progress</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="border border-gray-100 rounded p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-500">In Progress</p>
-                          <p className="text-xl font-medium text-gray-900 mt-1">{lessonStats.inProgress} Lessons</p>
-                        </div>
-                        <div className="p-2 bg-yellow-50 rounded-full">
-                          <svg className="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
+                  <div className="border border-gray-100 rounded p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Completed</p>
+                        <p className="text-xl font-medium text-gray-900 mt-1">{completedCourses.length} Courses</p>
+                      </div>
+                      <div className="p-2 bg-green-50 rounded-full">
+                        <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                       </div>
                     </div>
-
-                    <div className="border border-gray-100 rounded p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-500">Completed</p>
-                          <p className="text-xl font-medium text-gray-900 mt-1">{lessonStats.completed} Lessons</p>
-                        </div>
-                        <div className="p-2 bg-green-50 rounded-full">
-                          <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M5 13l4 4L19 7" />
-                          </svg>
-                        </div>
-                      </div>
-                      <div className="mt-4">
-                        <div className="w-full bg-gray-100 rounded-full h-1.5">
-                          <div
-                            className="bg-green-500 h-1.5 rounded-full transition-all duration-300"
-                            style={{
-                              width: `${enrolledCourses.length > 0
-                                ? (lessonStats.completed / (lessonStats.completed + lessonStats.inProgress) * 100)
-                                : 0}%`
-                            }}
-                          ></div>
-                        </div>
-                        <p className="text-xs text-gray-500 mt-1 text-right">
-                          {enrolledCourses.length > 0
-                            ? Math.round(lessonStats.completed / (lessonStats.completed + lessonStats.inProgress) * 100)
-                            : 0}% complete
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="border border-gray-100 rounded p-4">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-sm font-medium text-gray-500">Total Time</p>
-                          <p className="text-xl font-medium text-gray-900 mt-1">
-                            {formatLearningTime(lessonStats.totalTimeSpent)}
-                          </p>
-                        </div>
-                        <div className="p-2 bg-indigo-50 rounded-full">
-                          <svg className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                        </div>
+                    <div className="mt-4">
+                      <div className="w-full bg-gray-100 rounded-full h-1.5">
+                        <div
+                          className="bg-green-500 h-1.5 rounded-full transition-all duration-300"
+                          style={{ width: `${progressPercentages.completed}%` }}
+                        ></div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                {/* Continue Learning Section */}
-                <div className="mb-12"> {/* Always render this container */}
-                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-2xl font-semibold">Continue Learning</h2>
-                    <Button href="/courses" variant="outline" size="sm">Browse More Courses</Button>
+                  <div className="border border-gray-100 rounded p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Learning Time</p>
+                        <p className="text-xl font-medium text-gray-900 mt-1">{totalLearningTimeHours} Hours</p>
+                      </div>
+                      <div className="p-2 bg-purple-50 rounded-full">
+                        <svg className="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                    </div>
                   </div>
-                  {/* Actual Continue Learning Content */}
-                  {enrolledCourses.length > 0 ? (
-                    <CourseGrid courses={enrolledCourses} />
-                  ) : (
-                    <div className="bg-white rounded-xl shadow-soft p-6 border border-neutral-200 text-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-neutral-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                      <h3 className="text-xl font-semibold mb-2">No Courses in Progress</h3>
-                      <p className="text-neutral-600 mb-4">Looks like you haven't started any courses yet. Find your first course!</p>
-                      <Button href="/courses" variant="primary">Browse Courses</Button>
-                    </div>
-                  )}
-                </div>
-
-                {/* Completed Courses Section */}
-                <div>
-                  <h2 className="text-2xl font-semibold mb-6">Completed Courses</h2>
-                  {completedCourses.length > 0 ? (
-                    <CourseGrid courses={completedCourses} />
-                  ) : (
-                    <div className="bg-white rounded-xl shadow-soft p-6 border border-neutral-200 text-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-neutral-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                      <h3 className="text-xl font-semibold mb-2">No Completed Courses Yet</h3>
-                      <p className="text-neutral-600 mb-4">Keep learning to unlock your completed courses here!</p>
-                      <Button href="/courses" variant="primary">Browse Courses</Button>
-                    </div>
-                  )}
                 </div>
               </div>
-            </div>
-          </div>
-          </section>
-        </MainLayout>
-      );
-    }
+
+              {/* Lesson Progress Section */}
+              <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+                <h2 className="text-lg font-medium text-gray-900 mb-6">Lesson Progress</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="border border-gray-100 rounded p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">In Progress</p>
+                        <p className="text-xl font-medium text-gray-900 mt-1">{lessonStats.inProgress} Lessons</p>
+                      </div>
+                      <div className="p-2 bg-yellow-50 rounded-full">
+                        <svg className="h-5 w-5 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <div className="w-full bg-gray-100 rounded-full h-1.5">
+                        <div
+                          className="bg-yellow-500 h-1.5 rounded-full transition-all duration-300"
+                          style={{ width: `${lessonStats.inProgress > 0 ? 50 : 0}%` }} // Placeholder progress
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border border-gray-100 rounded p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Completed</p>
+                        <p className="text-xl font-medium text-gray-900 mt-1">{lessonStats.completed} Lessons</p>
+                      </div>
+                      <div className="p-2 bg-green-50 rounded-full">
+                        <svg className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <div className="w-full bg-gray-100 rounded-full h-1.5">
+                        <div
+                          className="bg-green-500 h-1.5 rounded-full transition-all duration-300"
+                          style={{ width: `${lessonStats.completed > 0 ? 100 : 0}%` }} // Placeholder progress
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border border-gray-100 rounded p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm font-medium text-gray-500">Total Time</p>
+                        <p className="text-xl font-medium text-gray-900 mt-1">{formatLearningTime(lessonStats.totalTimeSpent)}</p>
+                      </div>
+                      <div className="p-2 bg-indigo-50 rounded-full">
+                        <svg className="h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Continue Learning Section */}
+              <div className="p-6 mb-8">
+                <h2 className="text-lg font-medium text-gray-900 mb-6">Continue Learning</h2>
+                {enrolledCourses.length > 0 ? (
+                  <CourseGrid courses={enrolledCourses} />
+                ) : (
+                  <div className="text-center py-8">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-neutral-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5s3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18s-3.332.477-4.5 1.253" /></svg>
+                    <h3 className="text-xl font-semibold mb-2">No Courses In Progress</h3>
+                    <p className="text-neutral-600 mb-4">Enroll in a course to start your learning journey.</p>
+                    <Button href="/courses" variant="primary">Browse Courses</Button>
+                  </div>
+                )}
+              </div>
+
+              {/* Completed Courses Section */}
+              <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+                <h2 className="text-lg font-medium text-gray-900 mb-6">Completed Courses</h2>
+                {completedCourses.length > 0 ? (
+                  <CourseGrid courses={completedCourses} />
+                ) : (
+                  <div className="text-center py-8">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-neutral-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <h3 className="text-xl font-semibold mb-2">No Completed Courses Yet</h3>
+                    <p className="text-neutral-600 mb-4">Keep learning to unlock your completed courses here!</p>
+                    <Button href="/courses" variant="primary">Browse Courses</Button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
+      </section>
+    </MainLayout>
+  );
+}
