@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --foreground-rgb: 0, 0, 0;
+  --background-start-rgb: 250, 250, 250;
+  --background-end-rgb: 255, 255, 255;
+}
+
+/* Base styles */
+@layer base {
+  html {
+    @apply scroll-smooth;
+}
+
+  body {
+    @apply font-body text-neutral-800 bg-white;
+    background: linear-gradient(
+      to bottom,
+      transparent,
+      rgb(var(--background-end-rgb))
+    )
+    rgb(var(--background-start-rgb));
+}
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-bold;
+}
+
+  h1 {
+    @apply text-4xl md:text-5xl lg:text-6xl tracking-tight;
+}
+
+  h2 {
+    @apply text-3xl md:text-4xl tracking-tight;
+}
+
+  h3 {
+    @apply text-2xl md:text-3xl tracking-tight;
+}
+
+  h4 {
+    @apply text-xl md:text-2xl;
+}
+
+  h5 {
+    @apply text-lg md:text-xl;
+}
+
+  h6 {
+    @apply text-base md:text-lg;
+}
+
+  p {
+    @apply my-4 leading-relaxed;
+}
+
+  a {
+    @apply text-secondary hover:text-secondary-600 transition-colors duration-200;
+}
+
+  code, pre {
+    @apply font-mono;
+}
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+/* Custom utility classes */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-all duration-200 ease-in-out;
+}
+
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary to-primary-600 text-white hover:shadow-lg hover:from-primary-600 hover:to-primary-700;
+}
+
+  .btn-secondary {
+    @apply bg-gradient-to-r from-secondary to-secondary-600 text-white hover:shadow-lg hover:from-secondary-600 hover:to-secondary-700;
+}
+
+  .btn-success {
+    @apply bg-gradient-to-r from-success-600 to-success text-white hover:shadow-lg hover:from-primary hover:to-primary-600 transition-all duration-300;
+}
+
+  .btn-outline {
+    @apply border border-primary text-primary hover:bg-primary-50;
+}
+
+  .card {
+    @apply bg-white rounded-xl shadow-soft p-6 transition-all duration-200 ease-in-out hover:shadow-card;
+}
+
+  .input {
+    @apply w-full px-4 py-2 border border-neutral-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-300 focus:border-transparent;
+}
+
+  .label {
+    @apply block text-sm font-medium text-neutral-700 mb-1;
+}
+
+  .section {
+    @apply py-16 md:py-24;
+}
+
+  .container-custom {
+    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
+}
+
+  .heading-gradient {
+    @apply bg-gradient-to-r from-primary to-primary-600 text-transparent bg-clip-text;
+}
+
+  .heading-gradient-secondary {
+    @apply bg-gradient-to-r from-secondary to-secondary-600 text-transparent bg-clip-text;
+}
+
+  .text-enhance {
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.5), 0 0 2px rgba(255, 255, 255, 0.3), 0 0 3px rgba(255, 255, 255, 0.2);
+}
+
+  /* Rich Text Editor styles */
+  .rich-text-wrapper {
+    @apply w-full;
+}
+
+  .rich-text-toolbar {
+    @apply bg-white border-neutral-300;
+}
+
+  .rich-text-editor {
+    @apply bg-white text-neutral-800 min-h-[200px] focus:outline-none;
+}
+
+  /* Override Draft.js styles */
+  .public-DraftStyleDefault-block {
+    @apply my-2;
+}
+
+  .rdw-option-wrapper {
+    @apply border border-neutral-300 rounded-md;
+}
+
+  .rdw-option-active {
+    @apply bg-primary-50 border-primary-300;
+}
+
+  .rdw-dropdown-wrapper {
+    @apply border border-neutral-300 rounded-md;
+}
+
+  .rdw-dropdown-optionwrapper {
+    @apply border border-neutral-300 rounded-md mt-1 overflow-y-auto max-h-40;
+}
+}
+

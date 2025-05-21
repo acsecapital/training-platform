@@ -1,0 +1,23 @@
+// training-platform/functions/tsconfig.json
+{
+    "compilerOptions": {
+      "module": "commonjs",         // Use CommonJS for standard Node execution in Cloud Functions v1/v2
+      "esModuleInterop": true,      // Allows easier default imports like 'import cors from "cors";'
+      "target": "es2021",           // Target a reasonably modern ECMAScript version supported by Node 18+
+      "strict": true,               // Enable all strict type-checking options
+      "noImplicitReturns": true,    // Report error when not all code paths in function return a value.
+      "noUnusedLocals": true,       // Report errors on unused local variables.
+      "outDir": "lib",              // Redirect output structure to the 'lib' folder (standard for Firebase Functions)
+      "sourceMap": true,            // Generate corresponding '.map' file for debugging
+      "skipLibCheck": true,         // Skip type checking of declaration files (.d.ts) - speeds up compilation
+      "forceConsistentCasingInFileNames": true // Disallow inconsistently-cased references to the same file.
+  },
+    "compileOnSave": true,          // Compile files on save (editor feature)
+    "include": [
+      "src"                         // Only include files in the 'src' directory for compilation
+    ],
+    "exclude": [
+       "node_modules",              // Exclude node_modules
+       "lib"                        // Exclude the output directory
+    ]
+}

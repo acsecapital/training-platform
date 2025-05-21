@@ -1,0 +1,26 @@
+{
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": "explicit" // Use "explicit" for ESLint v8+, or true for older
+    },
+    "editor.formatOnSave": true,
+    "[javascript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[json]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[markdown]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    // Optional: Set your editor's tab size to match what ESLint expects.
+    // Your ESLint errors suggest it expects more spaces than you're using.
+    // For example, if ESLint expects 2 spaces for an indent level:
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true // Usually true for space-based indentation
+}
